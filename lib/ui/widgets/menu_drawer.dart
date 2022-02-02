@@ -8,6 +8,7 @@ import 'package:reaxit/ui/screens/calendar_screen.dart';
 import 'package:reaxit/ui/screens/members_screen.dart';
 import 'package:reaxit/ui/screens/profile_screen.dart';
 import 'package:reaxit/ui/screens/settings_screen.dart';
+import 'package:reaxit/ui/screens/vacancies_screen.dart';
 import 'package:reaxit/ui/screens/welcome_screen.dart';
 import 'package:reaxit/ui/widgets/cached_image.dart';
 
@@ -209,6 +210,21 @@ class MenuDrawer extends StatelessWidget {
               } else {
                 routerDelegate.replace(
                   TypedMaterialPage(child: AlbumsScreen(), name: 'Albums'),
+                );
+              }
+            },
+          ),
+          ListTile(
+            title: const Text('Vacancies'),
+            leading: const Icon(Icons.business),
+            selected: routerDelegate.stack.last.child is VacanciesScreen,
+            onTap: () {
+              if (routerDelegate.stack.last.child is VacanciesScreen) {
+                Navigator.of(context).pop();
+              } else {
+                routerDelegate.replace(
+                  TypedMaterialPage(
+                      child: VacanciesScreen(), name: 'Vacancies'),
                 );
               }
             },
