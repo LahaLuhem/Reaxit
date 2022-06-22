@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:reaxit/ui/router.dart';
-import 'package:reaxit/ui/screens/vacancy_screen.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/menu_drawer.dart';
+
+import 'vacancy_screen.dart';
 
 class VacanciesScreen extends StatelessWidget {
   @override
