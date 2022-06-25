@@ -1,9 +1,11 @@
+import 'package:add_2_calendar/add_2_calendar.dart' as add2calendar;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/calendar_cubit.dart';
 import 'package:reaxit/blocs/event_cubit.dart';
 import 'package:reaxit/blocs/payment_user_cubit.dart';
@@ -11,10 +13,7 @@ import 'package:reaxit/blocs/registrations_cubit.dart';
 import 'package:reaxit/blocs/welcome_cubit.dart';
 import 'package:reaxit/models/event.dart';
 import 'package:reaxit/models/payment.dart';
-import 'package:reaxit/ui/router.dart';
-import 'package:reaxit/ui/screens/event_admin_screen.dart';
-import 'package:reaxit/ui/screens/registration_screen.dart';
-import 'package:reaxit/ui/screens/food_screen.dart';
+import 'package:reaxit/routes.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/cached_image.dart';
 import 'package:reaxit/ui/widgets/error_scroll_view.dart';
@@ -30,7 +29,7 @@ class EventScreen extends StatefulWidget {
   EventScreen({required this.pk, this.event}) : super(key: ValueKey(pk));
 
   @override
-  _EventScreenState createState() => _EventScreenState();
+  State<EventScreen> createState() => _EventScreenState();
 }
 
 class _EventScreenState extends State<EventScreen> {
@@ -84,18 +83,15 @@ class _EventScreenState extends State<EventScreen> {
                 Uri url = Theme.of(context).platform == TargetPlatform.iOS
                     ? Uri(
                         scheme: 'maps',
-                        queryParameters: {'daddr': event.location})
+                        queryParameters: {'daddr': event.location},
+                      )
                     : Uri(
                         scheme: 'https',
                         host: 'maps.google.com',
                         path: 'maps',
                         queryParameters: {'daddr': event.location},
                       );
-                launch(
-                  url.toString(),
-                  forceSafariVC: false,
-                  forceWebView: false,
-                );
+                launchUrl(url, mode: LaunchMode.externalNonBrowserApplication);
               },
             ),
           ),
@@ -103,8 +99,6 @@ class _EventScreenState extends State<EventScreen> {
       ],
     );
   }
-
-  // TODO: Someday: add animations back in.
 
   /// Create all info of an event until the description, including buttons.
   Widget _makeEventInfo(Event event) {
@@ -513,9 +507,10 @@ class _EventScreenState extends State<EventScreen> {
     return ElevatedButton.icon(
       onPressed: () async {
         try {
+          final calendarCubit = BlocProvider.of<CalendarCubit>(context);
           await _eventCubit.register();
           await _registrationsCubit.load();
-          BlocProvider.of<CalendarCubit>(context).load();
+          calendarCubit.load();
         } on ApiException {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -532,11 +527,12 @@ class _EventScreenState extends State<EventScreen> {
     return ElevatedButton.icon(
       onPressed: () async {
         try {
+          final calendarCubit = BlocProvider.of<CalendarCubit>(context);
           await _eventCubit.cancelRegistration(
             registrationPk: event.registration!.pk,
           );
           await _registrationsCubit.load();
-          BlocProvider.of<CalendarCubit>(context).load();
+          calendarCubit.load();
         } on ApiException {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             behavior: SnackBarBehavior.floating,
@@ -592,16 +588,10 @@ class _EventScreenState extends State<EventScreen> {
           try {
             final registration = await _eventCubit.register();
             if (event.hasFields) {
-              ThaliaRouterDelegate.of(context).push(
-                TypedMaterialPage(
-                  child: RegistrationScreen(
-                    eventPk: event.pk,
-                    registrationPk: registration.pk,
-                  ),
-                  name: 'Registration(event: ${event.pk}, '
-                      'registration: ${registration.pk})',
-                ),
-              );
+              context.pushNamed('event-registration', params: {
+                'eventPk': event.pk.toString(),
+                'registrationPk': registration.pk.toString(),
+              });
             }
             BlocProvider.of<CalendarCubit>(context).load();
           } on ApiException {
@@ -624,15 +614,12 @@ class _EventScreenState extends State<EventScreen> {
         try {
           final registration = await _eventCubit.register();
           if (event.hasFields) {
-            ThaliaRouterDelegate.of(context).push(
-              TypedMaterialPage(
-                child: RegistrationScreen(
-                  eventPk: event.pk,
-                  registrationPk: registration.pk,
-                ),
-                name: 'Registration(event: ${event.pk}, '
-                    'registration: ${registration.pk})',
-              ),
+            context.pushNamed(
+              'event-registration',
+              params: {
+                'eventPk': event.pk.toString(),
+                'registrationPk': registration.pk.toString(),
+              },
             );
           }
           BlocProvider.of<CalendarCubit>(context).load();
@@ -706,18 +693,13 @@ class _EventScreenState extends State<EventScreen> {
 
   Widget _makeUpdateButton(Event event) {
     return ElevatedButton.icon(
-      onPressed: () {
-        ThaliaRouterDelegate.of(context).push(
-          TypedMaterialPage(
-            child: RegistrationScreen(
-              eventPk: event.pk,
-              registrationPk: event.registration!.pk,
-            ),
-            name: 'Registration(event: ${event.pk}, '
-                'registration: ${event.registration!.pk})',
-          ),
-        );
-      },
+      onPressed: () => context.pushNamed(
+        'event-registration',
+        params: {
+          'eventPk': event.pk.toString(),
+          'registrationPk': event.registration!.pk.toString(),
+        },
+      ),
       icon: const Icon(Icons.build),
       label: const Text('UPDATE REGISTRATION'),
     );
@@ -727,17 +709,7 @@ class _EventScreenState extends State<EventScreen> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () {
-          ThaliaRouterDelegate.of(context).push(
-            TypedMaterialPage(
-              child: FoodScreen(
-                pk: event.foodEvent!,
-                event: event,
-              ),
-              name: 'FoodEvent(${event.foodEvent})',
-            ),
-          );
-        },
+        onPressed: () => context.pushNamed('food', extra: event),
         icon: const Icon(Icons.local_pizza),
         label: const Text('ORDER FOOD'),
       ),
@@ -833,7 +805,7 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   TextSpan _makeTermsAndConditions(Event event) {
-    const url = config.termsAndConditionsUrl;
+    final url = config.termsAndConditionsUrl;
     return TextSpan(
       children: [
         const TextSpan(
@@ -844,15 +816,11 @@ class _EventScreenState extends State<EventScreen> {
           recognizer: TapGestureRecognizer()
             ..onTap = () async {
               try {
-                await launch(
-                  url,
-                  forceSafariVC: false,
-                  forceWebView: false,
-                );
+                await launchUrl(url, mode: LaunchMode.externalApplication);
               } catch (_) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   behavior: SnackBarBehavior.floating,
-                  content: Text('Could not open "$url".'),
+                  content: Text('Could not open "${url.toString()}".'),
                 ));
               }
             },
@@ -875,17 +843,25 @@ class _EventScreenState extends State<EventScreen> {
       child: HtmlWidget(
         event.description,
         onTapUrl: (String url) async {
-          try {
-            await launch(
-              url,
-              forceSafariVC: false,
-              forceWebView: false,
-            );
-          } catch (_) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              behavior: SnackBarBehavior.floating,
-              content: Text('Could not open "$url".'),
-            ));
+          final uri = Uri.parse(url);
+          if (isDeepLink(uri)) {
+            context.go(Uri(
+              path: uri.path,
+              query: uri.query,
+            ).toString());
+            return true;
+          } else {
+            try {
+              await launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              );
+            } catch (_) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                behavior: SnackBarBehavior.floating,
+                content: Text('Could not open "$url".'),
+              ));
+            }
           }
           return true;
         },
@@ -962,10 +938,27 @@ class _EventScreenState extends State<EventScreen> {
           await Share.share('https://${config.apiHost}/events/$pk/');
         } catch (_) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            duration: Duration(seconds: 1),
+            behavior: SnackBarBehavior.floating,
             content: Text('Could not share the event.'),
           ));
         }
+      },
+    );
+  }
+
+  Widget _makeCalendarExportButton(Event event) {
+    return IconButton(
+      padding: const EdgeInsets.all(16),
+      color: Theme.of(context).primaryIconTheme.color,
+      icon: const Icon(Icons.edit_calendar_outlined),
+      onPressed: () async {
+        final exportableEvent = add2calendar.Event(
+          title: event.title,
+          location: event.location,
+          startDate: event.start,
+          endDate: event.end,
+        );
+        await add2calendar.Add2Calendar.addEvent2Cal(exportableEvent);
       },
     );
   }
@@ -983,10 +976,9 @@ class _EventScreenState extends State<EventScreen> {
             ),
             body: RefreshIndicator(
               onRefresh: () async {
-                // Await both loads.
-                var eventFuture = _eventCubit.load();
-                await _registrationsCubit.load();
-                await eventFuture;
+                // Await only the event info.
+                _registrationsCubit.load();
+                await _eventCubit.load();
               },
               child: ErrorScrollView(state.message!),
             ),
@@ -1007,24 +999,25 @@ class _EventScreenState extends State<EventScreen> {
             appBar: ThaliaAppBar(
               title: Text(event.title.toUpperCase()),
               actions: [
+                _makeCalendarExportButton(event),
                 _makeShareEventButton(widget.pk),
                 if (event.userPermissions.manageEvent)
                   IconButton(
                     padding: const EdgeInsets.all(16),
                     icon: const Icon(Icons.settings),
-                    onPressed: () {
-                      ThaliaRouterDelegate.of(context).push(
-                        TypedMaterialPage(
-                          child: EventAdminScreen(pk: event.pk),
-                          name: 'EventAdmin(${event.pk})',
-                        ),
-                      );
-                    },
+                    onPressed: () => context.pushNamed(
+                      'event-admin',
+                      params: {'eventPk': event.pk.toString()},
+                    ),
                   ),
               ],
             ),
             body: RefreshIndicator(
-              onRefresh: () => _eventCubit.load(),
+              onRefresh: () async {
+                // Await only the event info.
+                _registrationsCubit.load();
+                await _eventCubit.load();
+              },
               child: BlocBuilder<RegistrationsCubit, RegistrationsState>(
                 bloc: _registrationsCubit,
                 builder: (context, listState) {

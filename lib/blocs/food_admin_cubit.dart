@@ -1,13 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/config.dart' as config;
 import 'package:reaxit/blocs/detail_state.dart';
 import 'package:reaxit/models/food_order.dart';
 import 'package:reaxit/models/payment.dart';
 
-typedef FoodAdminState = DetailState<List<FoodOrder>>;
+typedef FoodAdminState = DetailState<List<AdminFoodOrder>>;
 
 class FoodAdminCubit extends Cubit<FoodAdminState> {
   final ApiRepository api;

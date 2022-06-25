@@ -4,7 +4,9 @@ import 'package:reaxit/models/photo.dart';
 part 'member.g.dart';
 
 enum Programme { computingscience, informationscience }
+
 enum MembershipType { member, benefactor, honorary }
+
 enum DisplayNamePreference {
   full,
   nickname,
@@ -37,6 +39,25 @@ class ListMember {
 
   factory ListMember.fromJson(Map<String, dynamic> json) =>
       _$ListMemberFromJson(json);
+}
+
+@JsonSerializable(fieldRename: FieldRename.snake)
+class AdminListMember extends ListMember {
+  final String firstName;
+  final String lastName;
+
+  String get fullName => '$firstName $lastName';
+
+  const AdminListMember(
+    int pk,
+    MembershipType? membershipType,
+    Profile profile,
+    this.firstName,
+    this.lastName,
+  ) : super(pk, membershipType, profile);
+
+  factory AdminListMember.fromJson(Map<String, dynamic> json) =>
+      _$AdminListMemberFromJson(json);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

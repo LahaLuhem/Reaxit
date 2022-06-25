@@ -1,13 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/calendar_cubit.dart';
 import 'package:reaxit/models/event.dart';
-import 'package:reaxit/ui/router.dart';
-import 'package:reaxit/ui/screens/event_screen.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/error_scroll_view.dart';
 import 'package:reaxit/ui/widgets/menu_drawer.dart';
@@ -16,7 +15,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class CalendarScreen extends StatefulWidget {
   @override
-  _CalendarScreenState createState() => _CalendarScreenState();
+  State<CalendarScreen> createState() => _CalendarScreenState();
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
@@ -253,10 +252,6 @@ class CalendarScrollView extends StatelessWidget {
                   final dayGroupedEvents = _groupByDay(events);
                   final days = dayGroupedEvents.keys.toList();
 
-                  // TODO: StickyHeaders currently cause silent exceptions
-                  //  when they build. This is only visible while catching
-                  //  'All Exceptions', and does not affect the user. See
-                  //  https://github.com/fluttercommunity/flutter_sticky_headers/issues/39.
                   return StickyHeader(
                     header: SizedBox(
                       width: double.infinity,
@@ -386,22 +381,15 @@ class _EventCard extends StatelessWidget {
         child: InkWell(
           onTap: () {
             if (event.parentEvent is PartnerEvent) {
-              launch(
-                (event.parentEvent as PartnerEvent).url.toString(),
-                forceSafariVC: false,
-                forceWebView: false,
+              launchUrl(
+                (event.parentEvent as PartnerEvent).url,
+                mode: LaunchMode.externalApplication,
               );
             } else {
-              ThaliaRouterDelegate.of(context).push(
-                TypedMaterialPage(
-                  child: EventScreen(
-                    pk: event.pk,
-                    event: event.parentEvent is Event
-                        ? event.parentEvent as Event
-                        : null,
-                  ),
-                  name: 'Event(${event.pk})',
-                ),
+              context.pushNamed(
+                'event',
+                params: {'eventPk': event.pk.toString()},
+                extra: event.parentEvent,
               );
             }
           },

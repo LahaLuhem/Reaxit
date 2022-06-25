@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/list_state.dart';
 import 'package:reaxit/models/event_registration.dart';
 
@@ -42,11 +42,11 @@ class RegistrationsCubit extends Cubit<RegistrationsState> {
   }
 
   Future<void> more() async {
-    final _state = state;
+    final oldState = state;
 
-    if (_state.isDone || _state.isLoading || _state.isLoadingMore) return;
+    if (oldState.isDone || oldState.isLoading || oldState.isLoadingMore) return;
 
-    emit(_state.copyWith(isLoadingMore: true));
+    emit(oldState.copyWith(isLoadingMore: true));
 
     try {
       var listResponse = await api.getEventRegistrations(

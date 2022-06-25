@@ -8,7 +8,7 @@ part of 'member.dart';
 
 ListMember _$ListMemberFromJson(Map<String, dynamic> json) => ListMember(
       json['pk'] as int,
-      _$enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
+      $enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
       Profile.fromJson(json['profile'] as Map<String, dynamic>),
     );
 
@@ -19,52 +19,33 @@ Map<String, dynamic> _$ListMemberToJson(ListMember instance) =>
       'profile': instance.profile,
     };
 
-K _$enumDecode<K, V>(
-  Map<K, V> enumValues,
-  Object? source, {
-  K? unknownValue,
-}) {
-  if (source == null) {
-    throw ArgumentError(
-      'A value must be provided. Supported values: '
-      '${enumValues.values.join(', ')}',
-    );
-  }
-
-  return enumValues.entries.singleWhere(
-    (e) => e.value == source,
-    orElse: () {
-      if (unknownValue == null) {
-        throw ArgumentError(
-          '`$source` is not one of the supported values: '
-          '${enumValues.values.join(', ')}',
-        );
-      }
-      return MapEntry(unknownValue, enumValues.values.first);
-    },
-  ).key;
-}
-
-K? _$enumDecodeNullable<K, V>(
-  Map<K, V> enumValues,
-  dynamic source, {
-  K? unknownValue,
-}) {
-  if (source == null) {
-    return null;
-  }
-  return _$enumDecode<K, V>(enumValues, source, unknownValue: unknownValue);
-}
-
 const _$MembershipTypeEnumMap = {
   MembershipType.member: 'member',
   MembershipType.benefactor: 'benefactor',
   MembershipType.honorary: 'honorary',
 };
 
+AdminListMember _$AdminListMemberFromJson(Map<String, dynamic> json) =>
+    AdminListMember(
+      json['pk'] as int,
+      $enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
+      Profile.fromJson(json['profile'] as Map<String, dynamic>),
+      json['first_name'] as String,
+      json['last_name'] as String,
+    );
+
+Map<String, dynamic> _$AdminListMemberToJson(AdminListMember instance) =>
+    <String, dynamic>{
+      'pk': instance.pk,
+      'membership_type': _$MembershipTypeEnumMap[instance.membershipType],
+      'profile': instance.profile,
+      'first_name': instance.firstName,
+      'last_name': instance.lastName,
+    };
+
 Member _$MemberFromJson(Map<String, dynamic> json) => Member(
       json['pk'] as int,
-      _$enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
+      $enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
       Profile.fromJson(json['profile'] as Map<String, dynamic>),
       (json['achievements'] as List<dynamic>)
           .map((e) => Achievement.fromJson(e as Map<String, dynamic>))
@@ -84,7 +65,7 @@ Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
 
 FullMember _$FullMemberFromJson(Map<String, dynamic> json) => FullMember(
       json['pk'] as int,
-      _$enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
+      $enumDecodeNullable(_$MembershipTypeEnumMap, json['membership_type']),
       FullProfile.fromJson(json['profile'] as Map<String, dynamic>),
       (json['achievements'] as List<dynamic>)
           .map((e) => Achievement.fromJson(e as Map<String, dynamic>))
@@ -110,7 +91,7 @@ Profile _$ProfileFromJson(Map<String, dynamic> json) => Profile(
           ? null
           : DateTime.parse(json['birthday'] as String),
       Photo.fromJson(json['photo'] as Map<String, dynamic>),
-      _$enumDecodeNullable(_$ProgrammeEnumMap, json['programme']),
+      $enumDecodeNullable(_$ProgrammeEnumMap, json['programme']),
       json['starting_year'] as int?,
       _nonEmptyUriFromJson(json['website'] as String?),
       json['profile_description'] as String?,
@@ -139,7 +120,7 @@ FullProfile _$FullProfileFromJson(Map<String, dynamic> json) => FullProfile(
           ? null
           : DateTime.parse(json['birthday'] as String),
       Photo.fromJson(json['photo'] as Map<String, dynamic>),
-      _$enumDecodeNullable(_$ProgrammeEnumMap, json['programme']),
+      $enumDecodeNullable(_$ProgrammeEnumMap, json['programme']),
       json['starting_year'] as int?,
       _nonEmptyUriFromJson(json['website'] as String?),
       json['profile_description'] as String?,
@@ -154,7 +135,7 @@ FullProfile _$FullProfileFromJson(Map<String, dynamic> json) => FullProfile(
       json['show_birthday'] as bool,
       json['initials'] as String?,
       json['nickname'] as String?,
-      _$enumDecode(
+      $enumDecode(
           _$DisplayNamePreferenceEnumMap, json['display_name_preference']),
       json['receive_optin'] as bool,
       json['receive_newsletter'] as bool,

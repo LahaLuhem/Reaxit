@@ -2,15 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/food_cubit.dart';
 import 'package:reaxit/blocs/payment_user_cubit.dart';
 import 'package:reaxit/models/event.dart';
 import 'package:reaxit/models/food_event.dart';
 import 'package:reaxit/models/product.dart';
-import 'package:reaxit/ui/router.dart';
-import 'package:reaxit/ui/screens/food_admin_screen.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/error_scroll_view.dart';
 
@@ -25,7 +24,7 @@ class FoodScreen extends StatefulWidget {
   FoodScreen({this.pk, this.event}) : super(key: ValueKey(pk));
 
   @override
-  _FoodScreenState createState() => _FoodScreenState();
+  State<FoodScreen> createState() => _FoodScreenState();
 }
 
 class _FoodScreenState extends State<FoodScreen> {
@@ -277,12 +276,17 @@ class _FoodScreenState extends State<FoodScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Row(
+                        textBaseline: TextBaseline.alphabetic,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
                         children: [
-                          Text(
-                            order.product.name,
-                            style: Theme.of(context).textTheme.headline6,
+                          Expanded(
+                            child: Text(
+                              order.product.name,
+                              style: Theme.of(context).textTheme.headline6,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                           Text(
                             order.isPaid
@@ -416,14 +420,10 @@ class _FoodScreenState extends State<FoodScreen> {
                     IconButton(
                       padding: const EdgeInsets.all(16),
                       icon: const Icon(Icons.settings),
-                      onPressed: () {
-                        ThaliaRouterDelegate.of(context).push(
-                          TypedMaterialPage(
-                            child: FoodAdminScreen(pk: foodEvent.pk),
-                            name: 'FoodAdmin(${foodEvent.pk})',
-                          ),
-                        );
-                      },
+                      onPressed: () => context.pushNamed(
+                        'food-admin',
+                        extra: foodEvent.pk,
+                      ),
                     ),
                 ],
               ),
@@ -476,7 +476,7 @@ class __ProductTileState extends State<_ProductTile> {
       title: Text.rich(
         TextSpan(
           children: [
-            TextSpan(text: widget.product.name + ' '),
+            TextSpan(text: '${widget.product.name} '),
             TextSpan(
               text: '€${widget.product.price}',
               style: Theme.of(context).textTheme.caption!.copyWith(

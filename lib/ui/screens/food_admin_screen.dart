@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/food_admin_cubit.dart';
 import 'package:reaxit/models/food_order.dart';
 import 'package:reaxit/models/payment.dart';
@@ -14,12 +14,10 @@ class FoodAdminScreen extends StatefulWidget {
   FoodAdminScreen({required this.pk}) : super(key: ValueKey(pk));
 
   @override
-  _FoodAdminScreenState createState() => _FoodAdminScreenState();
+  State<FoodAdminScreen> createState() => _FoodAdminScreenState();
 }
 
 class _FoodAdminScreenState extends State<FoodAdminScreen> {
-  // TODO: Someday: add ordering and filter.
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -90,7 +88,7 @@ class _FoodAdminScreenState extends State<FoodAdminScreen> {
 }
 
 class _OrderTile extends StatefulWidget {
-  final FoodOrder order;
+  final AdminFoodOrder order;
 
   _OrderTile({required this.order}) : super(key: ValueKey(order.pk));
 
@@ -102,7 +100,7 @@ class __OderTileState extends State<_OrderTile> {
   @override
   Widget build(BuildContext context) {
     final order = widget.order;
-    final name = order.member?.displayName ?? order.name!;
+    final name = order.member?.fullName ?? order.name!;
 
     late Widget paymentDropdown;
     if (order.isPaid && order.payment!.type == PaymentType.tpayPayment) {
@@ -176,8 +174,17 @@ class __OderTileState extends State<_OrderTile> {
     }
 
     return ListTile(
-      title: Text(name, maxLines: 1),
-      subtitle: Text(order.product.name),
+      horizontalTitleGap: 8,
+      title: Text(
+        name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        order.product.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

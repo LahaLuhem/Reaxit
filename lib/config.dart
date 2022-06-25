@@ -50,7 +50,7 @@ const List<String> oauthScopes = [
 
 const Duration searchDebounceTime = Duration(milliseconds: 200);
 
-const String versionNumber = 'v3.0.2';
+const String versionNumber = 'v3.1.2';
 
 final Uri feedbackUri = Uri.parse(
   'https://github.com/svthalia/Reaxit/issues',
@@ -60,8 +60,9 @@ final Uri changelogUri = Uri.parse(
   'https://github.com/svthalia/Reaxit/releases',
 );
 
-const String termsAndConditionsUrl =
-    'https://staging.thalia.nu/event-registration-terms/';
+final Uri termsAndConditionsUrl = Uri.parse(
+  'https://staging.thalia.nu/event-registration-terms/',
+);
 
 /// The period after which objects are removed from the cache when not used.
 const Duration cacheStalePeriod = Duration(days: 30);

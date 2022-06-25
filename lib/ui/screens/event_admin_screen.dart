@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/event_admin_cubit.dart';
 import 'package:reaxit/models/event_registration.dart';
 import 'package:reaxit/models/payment.dart';
@@ -14,12 +14,10 @@ class EventAdminScreen extends StatefulWidget {
   EventAdminScreen({required this.pk}) : super(key: ValueKey(pk));
 
   @override
-  _EventAdminScreenState createState() => _EventAdminScreenState();
+  State<EventAdminScreen> createState() => _EventAdminScreenState();
 }
 
 class _EventAdminScreenState extends State<EventAdminScreen> {
-  // TODO: Someday: add ordering and filter.
-
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -125,9 +123,10 @@ class __RegistrationTileState extends State<_RegistrationTile> {
   @override
   Widget build(BuildContext context) {
     final registration = widget.registration;
-    final name = registration.member?.displayName ?? registration.name!;
+    final name = registration.member?.fullName ?? registration.name!;
 
     final presentCheckbox = Checkbox(
+      visualDensity: VisualDensity.compact,
       value: present,
       onChanged: (value) async {
         final oldValue = present;
@@ -214,7 +213,6 @@ class __RegistrationTileState extends State<_RegistrationTile> {
                 content: Text(value != null
                     ? 'Could not mark $name as paid.'
                     : 'Could not mark $name as not paid.'),
-                duration: const Duration(seconds: 1),
               ));
             }
           },
@@ -225,7 +223,12 @@ class __RegistrationTileState extends State<_RegistrationTile> {
     }
 
     return ListTile(
-      title: Text(name, maxLines: 1),
+      horizontalTitleGap: 8,
+      title: Text(
+        name,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/payment_user_cubit.dart';
 import 'package:reaxit/blocs/sales_order_cubit.dart';
 
@@ -10,7 +10,7 @@ class TPaySalesOrderDialog extends StatefulWidget {
   TPaySalesOrderDialog({required this.pk}) : super(key: ValueKey(pk));
 
   @override
-  _TPaySalesOrderDialogState createState() => _TPaySalesOrderDialogState();
+  State<TPaySalesOrderDialog> createState() => _TPaySalesOrderDialogState();
 }
 
 class _TPaySalesOrderDialogState extends State<TPaySalesOrderDialog> {

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/registration_fields_cubit.dart';
 import 'package:reaxit/models/registration_field.dart';
-import 'package:reaxit/ui/router.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/error_center.dart';
 
@@ -16,7 +15,7 @@ class RegistrationScreen extends StatefulWidget {
       : super(key: ValueKey(registrationPk));
 
   @override
-  _RegistrationScreenState createState() => _RegistrationScreenState();
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
@@ -96,7 +95,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               maxLines: 5,
                               decoration: InputDecoration(
                                 labelText: field.isRequired
-                                    ? field.label + ' *'
+                                    ? '${field.label} *'
                                     : field.label,
                                 hintText: 'Lorem ipsum...',
                               ),
@@ -135,7 +134,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               ],
                               decoration: InputDecoration(
                                 labelText: field.isRequired
-                                    ? field.label + ' *'
+                                    ? '${field.label} *'
                                     : field.label,
                                 hintText: '123...',
                               ),
@@ -192,6 +191,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   registrationPk: widget.registrationPk,
                                   fields: state.result!,
                                 );
+                                Navigator.of(context).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     behavior: SnackBarBehavior.floating,
@@ -200,7 +200,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                     ),
                                   ),
                                 );
-                                ThaliaRouterDelegate.of(context).pop();
                               } on ApiException {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

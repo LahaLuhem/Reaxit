@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:reaxit/api_repository.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:reaxit/api/api_repository.dart';
 import 'package:reaxit/blocs/detail_state.dart';
 import 'package:reaxit/models/member.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -27,8 +26,8 @@ class FullMemberCubit extends Cubit<FullMemberState> {
     }
   }
 
-  Future<void> updateAvatar(File file) async {
-    await api.updateAvatar(file);
+  Future<void> updateAvatar(CroppedFile file) async {
+    await api.updateAvatar(file.path);
     await load();
   }
 
