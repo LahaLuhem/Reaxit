@@ -24,7 +24,7 @@ class FoodScreen extends StatefulWidget {
   FoodScreen({this.pk, this.event}) : super(key: ValueKey(pk));
 
   @override
-  _FoodScreenState createState() => _FoodScreenState();
+  State<FoodScreen> createState() => _FoodScreenState();
 }
 
 class _FoodScreenState extends State<FoodScreen> {
@@ -276,12 +276,17 @@ class _FoodScreenState extends State<FoodScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Row(
+                        textBaseline: TextBaseline.alphabetic,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
                         children: [
-                          Text(
-                            order.product.name,
-                            style: Theme.of(context).textTheme.headline6,
+                          Expanded(
+                            child: Text(
+                              order.product.name,
+                              style: Theme.of(context).textTheme.headline6,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                           Text(
                             order.isPaid
@@ -471,7 +476,7 @@ class __ProductTileState extends State<_ProductTile> {
       title: Text.rich(
         TextSpan(
           children: [
-            TextSpan(text: widget.product.name + ' '),
+            TextSpan(text: '${widget.product.name} '),
             TextSpan(
               text: '€${widget.product.price}',
               style: Theme.of(context).textTheme.caption!.copyWith(

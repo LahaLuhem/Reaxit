@@ -14,7 +14,7 @@ class FoodAdminScreen extends StatefulWidget {
   FoodAdminScreen({required this.pk}) : super(key: ValueKey(pk));
 
   @override
-  _FoodAdminScreenState createState() => _FoodAdminScreenState();
+  State<FoodAdminScreen> createState() => _FoodAdminScreenState();
 }
 
 class _FoodAdminScreenState extends State<FoodAdminScreen> {
@@ -174,8 +174,17 @@ class __OderTileState extends State<_OrderTile> {
     }
 
     return ListTile(
-      title: Text(name, maxLines: 1),
-      subtitle: Text(order.product.name),
+      horizontalTitleGap: 8,
+      title: Text(
+        name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: Text(
+        order.product.name,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

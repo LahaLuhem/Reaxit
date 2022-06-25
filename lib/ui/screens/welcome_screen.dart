@@ -8,6 +8,7 @@ import 'package:reaxit/blocs/welcome_cubit.dart';
 import 'package:reaxit/models/event.dart';
 import 'package:reaxit/models/frontpage_article.dart';
 import 'package:reaxit/models/slide.dart';
+import 'package:reaxit/routes.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/cached_image.dart';
 import 'package:reaxit/ui/widgets/error_scroll_view.dart';
@@ -18,7 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class WelcomeScreen extends StatefulWidget {
   @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
@@ -55,7 +56,32 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             article.title.toUpperCase(),
             style: Theme.of(context).textTheme.subtitle1,
           ),
-          HtmlWidget(article.content),
+          HtmlWidget(
+            article.content,
+            onTapUrl: (String url) async {
+              final uri = Uri(path: url);
+              if (isDeepLink(uri)) {
+                context.go(Uri(
+                  path: uri.path,
+                  query: uri.query,
+                ).toString());
+                return true;
+              } else {
+                try {
+                  await launchUrl(
+                    Uri.parse(url),
+                    mode: LaunchMode.externalApplication,
+                  );
+                } catch (_) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    behavior: SnackBarBehavior.floating,
+                    content: Text('Could not open "$url".'),
+                  ));
+                }
+                return true;
+              }
+            },
+          ),
         ],
       ),
     );
@@ -189,7 +215,7 @@ class SlidesCarousel extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _SlidesCarouselState createState() => _SlidesCarouselState();
+  State<SlidesCarousel> createState() => _SlidesCarouselState();
 }
 
 class _SlidesCarouselState extends State<SlidesCarousel> {
@@ -216,10 +242,9 @@ class _SlidesCarouselState extends State<SlidesCarousel> {
             return InkWell(
               onTap: slide.url != null
                   ? () async {
-                      await launch(
-                        slide.url.toString(),
-                        forceSafariVC: false,
-                        forceWebView: false,
+                      await launchUrl(
+                        slide.url!,
+                        mode: LaunchMode.externalApplication,
                       );
                     }
                   : null,
