@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:reaxit/ui/router.dart';
+import '../router.dart';
 import 'package:reaxit/ui/widgets/app_bar.dart';
 import 'package:reaxit/ui/widgets/menu_drawer.dart';
 
